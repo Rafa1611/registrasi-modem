@@ -76,7 +76,7 @@ export default function LoginPage() {
         </div>
 
         <p className="text-white/30 text-xs relative z-10">
-          Huawei MA5600 V800R015/R018
+          Rafa Hotspot - Huawei MA5600
         </p>
       </div>
 
