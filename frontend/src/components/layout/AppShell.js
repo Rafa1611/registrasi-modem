@@ -36,13 +36,13 @@ function Sidebar({ collapsed, onToggle, mobile = false }) {
     <div className={`flex flex-col h-full sidebar-bg text-white ${mobile ? 'w-[260px]' : collapsed ? 'w-[72px]' : 'w-[260px]'} transition-all duration-200`}>
       {/* Logo Area */}
       <div className="flex items-center gap-3 px-4 py-5 border-b border-white/10">
-        <div className="w-9 h-9 rounded-lg bg-emerald-500 flex items-center justify-center flex-shrink-0">
-          <Activity className="w-5 h-5 text-white" />
+        <div className="w-9 h-9 rounded-lg bg-white flex items-center justify-center flex-shrink-0 overflow-hidden">
+          <img src="/logo.png" alt="Rafa Hotspot" className="w-8 h-8 object-contain" />
         </div>
         {(!collapsed || mobile) && (
           <div className="overflow-hidden">
-            <h1 className="font-heading text-sm font-semibold whitespace-nowrap">OLT Registration</h1>
-            <p className="text-[11px] text-white/50">Huawei MA5600</p>
+            <h1 className="font-heading text-sm font-semibold whitespace-nowrap">Rafa Hotspot</h1>
+            <p className="text-[11px] text-white/50">Registrasi Modem</p>
           </div>
         )}
         {!mobile && (
