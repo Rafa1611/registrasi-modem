@@ -1,0 +1,38 @@
+[
+  {
+    "content": "Phase 1: Research Huawei MA5600 CLI patterns for parsing",
+    "status": "in_progress"
+  },
+  {
+    "content": "Phase 1: Build telnet module with command parsing (POC)",
+    "status": "pending"
+  },
+  {
+    "content": "Phase 2: Get design guidelines from design agent",
+    "status": "pending"
+  },
+  {
+    "content": "Phase 2: Install backend dependencies (telnetlib3)",
+    "status": "pending"
+  },
+  {
+    "content": "Phase 2: Build backend - Auth, OLT, Profiles, Discovery, Registration APIs",
+    "status": "pending"
+  },
+  {
+    "content": "Phase 2: Build frontend - Login, OLT Management, Profiles, Discovery, Registration UI",
+    "status": "pending"
+  },
+  {
+    "content": "Phase 2: All user stories covered in Development",
+    "status": "pending"
+  },
+  {
+    "content": "Phase 2: End to End Testing using Testing Agent",
+    "status": "pending"
+  },
+  {
+    "content": "Phase 3: Authentication + Registration Logging hardening",
+    "status": "pending"
+  }
+]
