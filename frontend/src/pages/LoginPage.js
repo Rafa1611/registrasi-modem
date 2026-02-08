@@ -85,10 +85,10 @@ export default function LoginPage() {
         <Card className="w-full max-w-[420px] shadow-lg border-[hsl(var(--border))]">
           <CardHeader className="space-y-1 pb-4">
             <div className="flex items-center gap-2 lg:hidden mb-4">
-              <div className="w-8 h-8 rounded-lg bg-[hsl(var(--primary))] flex items-center justify-center">
-                <Activity className="w-4 h-4 text-white" />
+              <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center overflow-hidden">
+                <img src="/logo.png" alt="Rafa Hotspot" className="w-7 h-7 object-contain" />
               </div>
-              <span className="font-heading font-semibold text-sm">OLT Registration</span>
+              <span className="font-heading font-semibold text-sm">Rafa Hotspot</span>
             </div>
             <CardTitle className="font-heading text-xl">
               {isRegister ? "Buat Akun Baru" : "Login"}
