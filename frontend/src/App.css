@@ -1,34 +1,56 @@
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
+/* OLT Huawei Registration System - Global Styles */
+
+/* Scrollbar Styles */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
-    }
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-.App-header {
-    background-color: #0f0f10;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 3px;
 }
 
-.App-link {
-    color: #61dafb;
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
 }
 
-@keyframes App-logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+/* Table row selection animation */
+tr[data-state='selected'] {
+  background-color: hsl(141 64% 86% / 0.3) !important;
+}
+
+/* Header gradient */
+.header-gradient {
+  background: linear-gradient(90deg, #103766 0%, #0A2A4A 55%, #103766 100%);
+}
+
+/* Sidebar */
+.sidebar-bg {
+  background-color: #0B2A4A;
+}
+
+/* Table header green */
+.table-header-green {
+  background-color: hsl(141 64% 86%);
+}
+
+/* Pulse animation for connection status */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+/* Loading overlay */
+.telnet-overlay {
+  backdrop-filter: blur(4px);
+  background: rgba(255, 255, 255, 0.85);
 }
