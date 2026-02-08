@@ -95,8 +95,8 @@ export default function LoginPage() {
             </CardTitle>
             <CardDescription>
               {isRegister
-                ? "Daftar untuk mengakses sistem registrasi OLT"
-                : "Masuk ke sistem registrasi OLT Huawei"}
+                ? "Daftar untuk mengakses sistem Rafa Hotspot"
+                : "Masuk ke sistem Rafa Hotspot Registrasi Modem"}
             </CardDescription>
           </CardHeader>
 
