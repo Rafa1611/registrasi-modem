@@ -181,22 +181,11 @@ export default function ONTRegisterPage() {
     });
 
     try {
-      // Try real register first, fallback to demo
-      let res;
-      try {
-        res = await axios.post(`${API}/register`, {
-          olt_id: selectedOltId,
-          profile_id: selectedProfileId,
-          ont_entries: entries,
-        });
-      } catch (regErr) {
-        // Fallback to demo register if telnet fails
-        res = await axios.post(`${API}/register/demo`, {
-          olt_id: selectedOltId,
-          profile_id: selectedProfileId,
-          ont_entries: entries,
-        });
-      }
+      const res = await axios.post(`${API}/register`, {
+        olt_id: selectedOltId,
+        profile_id: selectedProfileId,
+        ont_entries: entries,
+      });
       setRegisterResults(res.data);
       setResultsDialogOpen(true);
       if (res.data.success) {
