@@ -38,7 +38,7 @@ export default function DashboardPage() {
     <div className="space-y-6">
       <div>
         <h1 className="font-heading text-2xl font-semibold tracking-tight">Dashboard</h1>
-        <p className="text-sm text-muted-foreground mt-1">Overview sistem registrasi OLT Huawei</p>
+        <p className="text-sm text-muted-foreground mt-1">Overview sistem Rafa Hotspot Registrasi Modem</p>
       </div>
 
       {/* KPI Cards */}
