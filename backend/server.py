@@ -387,6 +387,146 @@ async def scan_ont_autofind(data: DiscoveryRequest, user=Depends(get_current_use
     finally:
         conn.disconnect()
 
+# Demo scan endpoint - simulates autofind for demonstration
+@api_router.post("/discovery/demo-scan")
+async def demo_scan_ont_autofind(data: DiscoveryRequest, user=Depends(get_current_user)):
+    olt = await db.olts.find_one({'_id': ObjectId(data.olt_id)})
+    if not olt:
+        raise HTTPException(status_code=404, detail="OLT tidak ditemukan")
+    
+    # Simulated discovered ONTs
+    discovered = [
+        {
+            'number': 1, 'fsp': '0/1/7', 'frame': 0, 'slot': 1, 'port': 7,
+            'sn': '414C434CB443689D', 'sn_friendly': 'ALCL-B443689D',
+            'password': '0x00000000000000000000', 'loid': '', 'checkcode': '',
+            'vendor_id': 'ALCL', 'ont_version': '3FE56641AOCK20',
+            'software_version': '3FE56641AOCK20', 'equipment_id': 'G-140W-MD',
+            'autofind_time': datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S+07:00')
+        },
+        {
+            'number': 2, 'fsp': '0/2/3', 'frame': 0, 'slot': 2, 'port': 3,
+            'sn': '48575443D7B00234', 'sn_friendly': 'HWTC-D7B00234',
+            'password': '0x00000000000000000000', 'loid': '', 'checkcode': '',
+            'vendor_id': 'HWTC', 'ont_version': '168D.A',
+            'software_version': 'V5R020C10S115', 'equipment_id': 'EG8145V5',
+            'autofind_time': datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S+07:00')
+        },
+        {
+            'number': 3, 'fsp': '0/1/3', 'frame': 0, 'slot': 1, 'port': 3,
+            'sn': '5A54454754A12345', 'sn_friendly': 'ZTEG-54A12345',
+            'password': '0x00000000000000000000', 'loid': '', 'checkcode': '',
+            'vendor_id': 'ZTEG', 'ont_version': 'V6.0.10P6T3',
+            'software_version': 'V6.0.10P6T3', 'equipment_id': 'F670L',
+            'autofind_time': datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S+07:00')
+        }
+    ]
+    
+    return {
+        'success': True,
+        'count': len(discovered),
+        'onts': discovered,
+        'scanned_at': datetime.now(timezone.utc).isoformat()
+    }
+
+# Demo register endpoint - simulates registration for demonstration
+@api_router.post("/register/demo")
+async def demo_register_onts(data: RegisterRequest, user=Depends(get_current_user)):
+    olt = await db.olts.find_one({'_id': ObjectId(data.olt_id)})
+    if not olt:
+        raise HTTPException(status_code=404, detail="OLT tidak ditemukan")
+    
+    profile = await db.profiles.find_one({'_id': ObjectId(data.profile_id)})
+    if not profile:
+        raise HTTPException(status_code=404, detail="Profile tidak ditemukan")
+    
+    from olt_telnet import generate_ont_add_command, generate_service_port_command
+    
+    results = []
+    next_ont_id = 0
+    next_sp_id = 100
+    
+    for entry in data.ont_entries:
+        sn = entry['sn']
+        fsp = entry.get('fsp', '0/0/0')
+        description = entry.get('description', '')
+        
+        parts = fsp.split('/')
+        frame = int(parts[0]) if len(parts) > 0 else 0
+        slot = int(parts[1]) if len(parts) > 1 else 0
+        port = int(parts[2]) if len(parts) > 2 else 0
+        
+        vlans = [v.strip() for v in profile.get('business_vlans', '40').split(',') if v.strip()]
+        vlan = int(vlans[0].split('-')[0]) if vlans else 40
+        
+        ont_cmd = generate_ont_add_command(
+            ont_id=next_ont_id, sn=sn,
+            line_profile_id=profile['line_profile_id'],
+            srv_profile_id=profile['srv_profile_id'],
+            description=description
+        )
+        sp_cmd = generate_service_port_command(
+            sp_id=next_sp_id, vlan=vlan,
+            frame=frame, slot=slot, port=port,
+            ont_id=next_ont_id,
+            gemport=profile.get('gemport', 1),
+            user_vlan=profile.get('user_vlan') or vlan
+        )
+        
+        reg_result = {
+            'sn': sn,
+            'fsp': fsp,
+            'description': description,
+            'success': True,
+            'ont_id': next_ont_id,
+            'service_port_id': next_sp_id,
+            'commands': [
+                f'interface gpon {frame}/{slot}',
+                ont_cmd,
+                'quit',
+                sp_cmd
+            ],
+            'output': [
+                f'  Number of ONTs that can be added: 128, already added: {next_ont_id}',
+                f'  ONTID :{next_ont_id}',
+                f'  Command: ont add 0 {next_ont_id} ... Successful',
+                f'  Service-port {next_sp_id} created successfully'
+            ],
+            'error': None
+        }
+        results.append(reg_result)
+        
+        # Log to DB
+        log_doc = {
+            'olt_id': data.olt_id,
+            'olt_name': olt['name'],
+            'profile_id': data.profile_id,
+            'profile_name': profile['name'],
+            'sn': sn,
+            'fsp': fsp,
+            'ont_id': next_ont_id,
+            'service_port_id': next_sp_id,
+            'description': description,
+            'success': True,
+            'error': None,
+            'commands': reg_result['commands'],
+            'output': reg_result['output'],
+            'registered_at': datetime.now(timezone.utc),
+            'registered_by': user['username']
+        }
+        await db.registration_logs.insert_one(log_doc)
+        
+        next_ont_id += 1
+        next_sp_id += 1
+    
+    return {
+        'success': True,
+        'results': results,
+        'total': len(results),
+        'success_count': len(results),
+        'fail_count': 0
+    }
+
 @api_router.get("/discovery/latest/{olt_id}")
 async def get_latest_discovery(olt_id: str, user=Depends(get_current_user)):
     discovery = await db.discoveries.find_one(
