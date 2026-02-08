@@ -48,18 +48,18 @@ export default function LoginPage() {
       <div className="hidden lg:flex lg:w-[480px] header-gradient flex-col justify-between p-10 relative overflow-hidden">
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 rounded-lg bg-emerald-500 flex items-center justify-center">
-              <Activity className="w-6 h-6 text-white" />
+            <div className="w-12 h-12 rounded-lg bg-white flex items-center justify-center overflow-hidden">
+              <img src="/logo.png" alt="Rafa Hotspot" className="w-10 h-10 object-contain" />
             </div>
             <div>
-              <h1 className="font-heading text-xl font-bold text-white">OLT Registration</h1>
-              <p className="text-white/50 text-xs">Huawei MA5600 Management</p>
+              <h1 className="font-heading text-xl font-bold text-white">Rafa Hotspot</h1>
+              <p className="text-white/50 text-xs">Registrasi Modem</p>
             </div>
           </div>
         </div>
 
         <div className="relative z-10">
-          <h2 className="font-heading text-3xl font-bold text-white mb-4">Registrasi ONT<br />Lebih Cepat & Mudah</h2>
+          <h2 className="font-heading text-3xl font-bold text-white mb-4">Registrasi Modem<br />Lebih Cepat & Mudah</h2>
           <p className="text-white/60 text-sm leading-relaxed">
             Web-based interface untuk menggantikan CLI OLT.
             Auto-discovery, 1-click registration, dan logging lengkap.
