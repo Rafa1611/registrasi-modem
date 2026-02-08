@@ -120,15 +120,7 @@ export default function ONTRegisterPage() {
     setDiscoveredOnts([]);
     setSelectedOnts(new Set());
     try {
-      // Try real scan first, fallback to demo
-      let res;
-      try {
-        res = await axios.post(`${API}/discovery/scan`, { olt_id: selectedOltId });
-      } catch (scanErr) {
-        // Fallback to demo scan if telnet fails
-        res = await axios.post(`${API}/discovery/demo-scan`, { olt_id: selectedOltId });
-        toast.info("Mode demo: OLT tidak tersedia, menampilkan data simulasi");
-      }
+      const res = await axios.post(`${API}/discovery/scan`, { olt_id: selectedOltId });
       setDiscoveredOnts(res.data.onts || []);
       if (res.data.count === 0) {
         toast.info("Tidak ada ONT baru ditemukan");
@@ -136,7 +128,7 @@ export default function ONTRegisterPage() {
         toast.success(`${res.data.count} ONT ditemukan!`);
       }
     } catch (err) {
-      toast.error(err.response?.data?.detail || "Gagal scan ONT");
+      toast.error(err.response?.data?.detail || "Gagal scan ONT. Periksa koneksi ke OLT.");
     } finally {
       setScanning(false);
     }
