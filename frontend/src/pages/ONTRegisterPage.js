@@ -275,7 +275,7 @@ export default function ONTRegisterPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-heading text-2xl font-semibold tracking-tight">ONT Register</h1>
-          <p className="text-sm text-muted-foreground mt-1">Registrasi ONT ke OLT Huawei</p>
+          <p className="text-sm text-muted-foreground mt-1">Registrasi Modem ke OLT Huawei</p>
         </div>
         <div className="flex items-center gap-3">
           <Label className="text-sm font-medium">Pilih OLT:</Label>
