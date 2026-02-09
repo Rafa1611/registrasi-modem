@@ -413,7 +413,8 @@ async def register_onts(data: RegisterRequest, user=Depends(get_current_user)):
     
     from olt_telnet import HuaweiOLTConnection, parse_ont_info_output, parse_service_port_output
     from olt_telnet import find_next_available_ont_id, find_next_available_service_port
-    from olt_telnet import generate_ont_add_command, generate_service_port_command, is_command_successful, get_command_failure_reason
+    from olt_telnet import generate_ont_add_command, generate_service_port_command
+    from olt_telnet import is_command_successful, get_command_failure_reason, is_ont_present
     
     conn = HuaweiOLTConnection(
         host=olt['ip_address'],
@@ -496,6 +497,15 @@ async def register_onts(data: RegisterRequest, user=Depends(get_current_user)):
                 if not is_command_successful(ont_output):
                     reason = get_command_failure_reason(ont_output) or 'unknown reason'
                     raise Exception(f"Command ONT add gagal di OLT: {reason}")
+
+                # Verify ONT benar-benar muncul di OLT agar tidak false-success
+                verify_raw = await asyncio.to_thread(conn.send_command, f"display ont info {port} all")
+                reg_result['output'].append(verify_raw)
+                verify_onts = parse_ont_info_output(verify_raw)
+                if not is_ont_present(verify_onts, next_ont_id, sn):
+                    raise Exception(
+                        f"ONT tidak ditemukan setelah ont add (port={port}, ont_id={next_ont_id}, sn={sn})"
+                    )
 
                 # Exit interface
                 await asyncio.to_thread(conn.send_command, "quit")

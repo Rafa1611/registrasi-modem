@@ -298,3 +298,16 @@ def generate_service_port_command(sp_id, vlan, frame, slot, port, ont_id, gempor
     uv = user_vlan if user_vlan else vlan
     cmd = f'service-port {sp_id} vlan {vlan} gpon {frame}/{slot}/{port} ont {ont_id} gemport {gemport} multi-service user-vlan {uv} tag-transform translate'
     return cmd
+
+
+def is_ont_present(existing_onts, ont_id, sn=None):
+    """Check whether ONT appears in parsed `display ont info ... all` output."""
+    expected_sn = (sn or '').strip().lower()
+    for ont in existing_onts:
+        if ont.get('ont_id') != ont_id:
+            continue
+        if not expected_sn:
+            return True
+        if str(ont.get('sn', '')).strip().lower() == expected_sn:
+            return True
+    return False
