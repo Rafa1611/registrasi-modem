@@ -247,11 +247,50 @@ def find_next_available_service_port(existing_sp_ids, max_id=4095):
     return None
 
 
-def generate_ont_add_command(ont_id, sn, line_profile_id, srv_profile_id, description=""):
-    """Generate the ont add CLI command."""
+def generate_ont_add_command(ont_id, sn, line_profile_id, srv_profile_id, description="", pon_port=0):
+    """Generate the ont add CLI command.
+
+    Backward compatible with older callers that did not pass PON port.
+    """
     desc_part = f' desc "{description}"' if description else ''
-    cmd = f'ont add 0 {ont_id} sn-auth "{sn}" omci ont-lineprofile-id {line_profile_id} ont-srvprofile-id {srv_profile_id}{desc_part}'
+    cmd = f'ont add {pon_port} {ont_id} sn-auth "{sn}" omci ont-lineprofile-id {line_profile_id} ont-srvprofile-id {srv_profile_id}{desc_part}'
     return cmd
+
+
+
+
+def get_command_failure_reason(raw_output):
+    """Extract a probable Huawei CLI failure reason from command output."""
+    if raw_output is None:
+        return 'Output command kosong (None)'
+
+    lines = [line.strip() for line in str(raw_output).splitlines() if line.strip()]
+    if not lines:
+        return 'Output command kosong'
+
+    failure_markers = [
+        'failure',
+        'error',
+        'invalid',
+        'parameter wrong',
+        'does not exist',
+        'already exist',
+        'incomplete command',
+        'unknown command',
+        'unrecognized command',
+    ]
+
+    for line in lines:
+        lower = line.lower()
+        if any(marker in lower for marker in failure_markers):
+            return line
+
+    return None
+
+
+def is_command_successful(raw_output):
+    """Best-effort validation for Huawei CLI command execution result."""
+    return get_command_failure_reason(raw_output) is None
 
 
 def generate_service_port_command(sp_id, vlan, frame, slot, port, ont_id, gemport, user_vlan=None):
