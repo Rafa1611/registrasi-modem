@@ -414,6 +414,7 @@ async def register_onts(data: RegisterRequest, user=Depends(get_current_user)):
     from olt_telnet import HuaweiOLTConnection, parse_ont_info_output, parse_service_port_output
     from olt_telnet import find_next_available_ont_id, find_next_available_service_port
     from olt_telnet import generate_ont_add_command, generate_service_port_command
+    from olt_telnet import is_command_successful, get_command_failure_reason, is_ont_present
     
     conn = HuaweiOLTConnection(
         host=olt['ip_address'],
@@ -483,6 +484,7 @@ async def register_onts(data: RegisterRequest, user=Depends(get_current_user)):
                 await asyncio.to_thread(conn.send_command, f"interface gpon {frame}/{slot}")
                 
                 ont_cmd = generate_ont_add_command(
+                    pon_port=port,
                     ont_id=next_ont_id,
                     sn=sn,
                     line_profile_id=profile['line_profile_id'],
@@ -492,7 +494,19 @@ async def register_onts(data: RegisterRequest, user=Depends(get_current_user)):
                 reg_result['commands'].append(ont_cmd)
                 ont_output = await asyncio.to_thread(conn.send_command, ont_cmd)
                 reg_result['output'].append(ont_output)
-                
+                if not is_command_successful(ont_output):
+                    reason = get_command_failure_reason(ont_output) or 'unknown reason'
+                    raise Exception(f"Command ONT add gagal di OLT: {reason}")
+
+                # Verify ONT benar-benar muncul di OLT agar tidak false-success
+                verify_raw = await asyncio.to_thread(conn.send_command, f"display ont info {port} all")
+                reg_result['output'].append(verify_raw)
+                verify_onts = parse_ont_info_output(verify_raw)
+                if not is_ont_present(verify_onts, next_ont_id, sn):
+                    raise Exception(
+                        f"ONT tidak ditemukan setelah ont add (port={port}, ont_id={next_ont_id}, sn={sn})"
+                    )
+
                 # Exit interface
                 await asyncio.to_thread(conn.send_command, "quit")
                 
@@ -519,7 +533,10 @@ async def register_onts(data: RegisterRequest, user=Depends(get_current_user)):
                     reg_result['commands'].append(sp_cmd)
                     sp_output = await asyncio.to_thread(conn.send_command, sp_cmd)
                     reg_result['output'].append(sp_output)
-                    
+                    if not is_command_successful(sp_output):
+                        reason = get_command_failure_reason(sp_output) or 'unknown reason'
+                        raise Exception(f"Command service-port gagal di OLT: {reason}")
+
                     # Add to existing SP list for next iteration
                     existing_sp.append(next_sp_id)
                     next_sp_id = find_next_available_service_port(existing_sp)
